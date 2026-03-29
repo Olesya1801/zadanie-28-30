@@ -1,0 +1,23 @@
+Для начала нужно сделать состав package.json. Он делается довольно просто: просто вписываем " npm init -y " в строку, нажимаем кнопку Enter и у нас появляется текст который нам нужен:
+
+{
+  "name": "tech-store-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --no-deprecation server.js",
+    "dev": "nodemon --no-deprecation server.js"
+  },
+  "keywords": [],
+  "author": "Ives van Hoorne",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^12.8.0",
+    "cors": "2.8.6",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  }
+}
