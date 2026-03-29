@@ -1,0 +1,81 @@
+В данной папке четыре файла js:
+1. customers.js
+Данный файл нам нужен для работы с клиентами и связывающими их контроллерами. Имеет два маршрута: один получает список всех клиентов, второй получает только одного клиента по его id, тертий - создаёт совершенно нового клиента, четвёртый - обновляет того или иного клиента, а пятый - удаляет того или иного клиента.
+const express = require("express");
+const router = express.Router();
+
+const customerController = require("./../controllers/customerController");
+const auth = require("./../middleware/auth");
+const { createCustomer, updateCustomer } = require("./../validators/customer");
+
+router.get("/", customerController.getAllCustomers);
+router.get("/:id", customerController.getCustomerById);
+
+router.post("/", auth, ...createCustomer, customerController.createCustomer);
+
+router.put("/:id", auth, ...updateCustomer, customerController.updateCustomer);
+
+router.delete("/:id", auth, customerController.deleteCustomer);
+
+module.exports = router;
+
+2. orders.js
+Тоже самое что и выше.
+const express = require("express");
+const router = express.Router();
+
+const orderController = require("./controllers/orderController");
+const auth = require("../middleware/auth");
+
+const {
+  createOrder,
+  updateOrder,
+  getAllOrdersQuery,
+} = require("./validators/order");
+
+router.get("/", async (req, res) => {
+  const { id } = req.params;
+  const order = await orderController.getById(id);
+  return res.status(200).json({ message: "Order retrieved" });
+});
+
+router.post("/", async (req, res) => {
+  const { id } = req.params;
+  const order = await orderController.createOrder(id);
+  return res.status(201).json({ message: "Order created" });
+});
+
+router.delete("/id", async (req, res) => {
+  const { id } = req.params;
+  await orderController.deleteOrder(id);
+  return res.status(204).send();
+});
+
+module.exports = router;
+
+3. pvz.js
+const express = require("express");
+const router = express.Router();
+const db = require("../db/db");
+
+router.get("/", (req, res, next) => {
+  try {
+    const pvz = db.prepare("SELECT * FROM pvz ORDER BY city, address").all();
+    res.json(pvz);
+  } catch (err) {
+    next(err);
+  }
+});
+
+module.exports = router;
+
+4. stats.js
+const express = require("express");
+const router = express.Router();
+
+const orderController = require("./controllers/orderController");
+const auth = require("../middleware/auth");
+
+router.get("/", auth, orderController.getStats);
+
+module.exports = router;
