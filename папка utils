@@ -1,0 +1,13 @@
+AppError. Содержит ошибки для данного приложения. Позволяет сделать ошибки более удобными и предсказуемыми.
+class AppError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+    this.statusCode = statusCode;
+    this.status = `${statusCode}`.stasrtsWith("4") ? "fail" : "error";
+    this.isPoerational = true;
+
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+module.exports = AppError;
