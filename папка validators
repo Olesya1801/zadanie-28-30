@@ -1,0 +1,134 @@
+customer.js выполняет функцию валидации информации о людях, которые пользуются магазином.
+const { body, param } = require("express-validator");
+const config = require("../config");
+
+const createCustomer = [
+  body("name")
+    .trim()
+    .notEmpty()
+    .withMessage("Имя обязательно")
+    .isLength({ min: config.MIN_NAME_LENGTH, max: config.MAX_NAME_LENGTH })
+    .withMessage(
+      `Имя должно быть от ${config.MIN_NAME_LENGTH} до ${config.MAX_NAME_LENGTH} символов`
+    ),
+
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email обязателен")
+    .isEmail()
+    .withMessage("Неккоректный формат email")
+    .normalizeEmail(),
+
+  body("phone")
+    .trim()
+    .notEmpty()
+    .withMessage("Телефон обязателен")
+    .matches(config.DEFUALT_PHONE_REGEX)
+    .withMessage("Телефон должен быть в формате +1(XXX)XXX-XX-XX"),
+];
+
+const updateCustomer = [
+  body("name")
+    .optional()
+    .trim()
+    .isLength({ min: config.MIN_NAME_LENGTH, max: config.MAX_NAME_LENGTH })
+    .withMessage(
+      `Имя должно быть от ${config.MIN_NAME_LENGTH} до ${config.MAX_NAME_LENGTH} символов`
+    ),
+
+  body("email")
+    .optional()
+    .trim()
+    .isEmail()
+    .withMessage("Некорректный формат email")
+    .normalizeEmail(),
+
+  body("phone")
+    .optional()
+    .trim()
+    .matches(config.DEFUALT_PHONE_REGEX)
+    .withMessage("Телефон должен быть в формате +1(XXX)XXX-XX-XX"),
+
+  param("id")
+    .isInt({ min: 1 })
+    .withMessage("ID должен быть положительным целым числом"),
+];
+
+module.exports = {
+  createCustomer,
+  updateCustomer,
+};
+
+
+order.js является наобором парвил.
+const { body, param, query } = require("express-validator");
+const config = require("../config");
+
+const createrOrder = [
+    body("customerId")
+    .isInt({ min: 1 })
+    .withMessage("cistomerId должен быть положительным целым числом"),
+
+    body("pvzId")
+    .isInt({ min: 1 })
+    .withMessage("pvzId должен быть положительным целым числом"),
+
+    body("status")
+    .optional()
+    .isInt(config.ORDER_STATUSES)
+    .withMessage(`Статус должен быть один из: ${config.ORDER_STATUES.JOIN(", ")}`,),
+
+    body("items")
+    .isInt({ min: 1 })
+    .withMessage("items должен быть непустым массивом"),
+
+    body("items.*.productName")
+    .trim()
+    .notEmpty()
+    .withMessage("Название товара обязательно"),
+
+    body("items.*.quantity")
+    .isInt({ min: 1 })
+    .withMessage("Количество должно быть >= 1"),
+
+    body("items.*.price").isFloat({ min: 0 }).withMessage("Цена должна быть >= 0"),
+];
+
+const updateOrder = [
+    body("status")
+    .optional()
+    .isIn(config.ORDER_STATUSES)
+    .withMessage(`Статус должен быть один из: ${config.ORDER_STATUES.join(", ")}`,),
+
+    body("pvzId")
+    .optional()
+    .isIn(config.ORDER_STATUSES)
+    .withMessage("pvzId должен быть положительным целым числом"),
+
+    body("id")
+    .isInt({ min: 1 })
+    .withMessage("ID заказа должен быть положительным целым числом"),
+];
+
+const getAllOrdersQuery = [
+    query("page")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("page должен быть >= 1"),
+
+    query("limit")
+    .optional()
+    .isInt({ min: 1, max: 20 })
+    .withMessage("limit должен быть от 1 до 20"),
+
+    query("status").optional().isIn(config.ORDER_STATUSES),
+
+    query("pvzId").optoinal().isInt({ min: 1 }),
+];
+
+module.exports = {
+    createrOrder,
+    updateOrder,
+    getAllOrdersQuery,
+}
